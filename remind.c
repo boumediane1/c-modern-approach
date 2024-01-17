@@ -12,6 +12,11 @@ int main() {
     int day, i, num_remind = 0;
 
     for (;;) {
+        if (num_remind == MAX_REMIND) {
+            printf("-- No space left --\n");
+            break;
+        }
+
         printf("Enter day and reminders: ");
         scanf("%2d", &day);
 
