@@ -8,7 +8,7 @@ int read_line(char str[], int n);
 
 int main() {
     char reminders[MAX_REMIND][MSG_LEN + 3];
-    char day_str[3], msg_str[MSG_LEN + 1], temp[MSG_LEN + 3];
+    char day_str[3], msg_str[MSG_LEN + 1];
     int day, i, num_remind = 0;
 
     for (;;) {
