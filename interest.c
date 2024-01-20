@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define NUM_RATES 5
+#define NUM_RATES (sizeof value / sizeof value[0])
 #define INITIAL_BALANCE 100.00
 
 int main() {
