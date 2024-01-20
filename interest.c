@@ -22,7 +22,9 @@ int main() {
     for (int year = 1; year <= num_years; year++) {
         printf("%3d    ", year);
         for (int i = 0; i < NUM_RATES; i++) {
-            value[i] += (low_rate + i) / 100.0 * value[i];
+            for (int month = 1; month <= 12; month++) {
+                value[i] += (low_rate + i) / 12.0 / 100.0 * value[i];
+            }
             printf("%7.2f", value[i]);
         }
         printf("\n");
