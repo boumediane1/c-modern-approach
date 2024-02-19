@@ -123,7 +123,7 @@ void update(void) {
 }
 
 void print(void) {
-    printf("Part Number Part Name Quantity on Hand\n");
+    printf("Part Number     Part Name     Quantity on Hand\n");
     for (int i = 0; i < num_parts; i++)
-        printf("%11d %-9s %16d\n", inventory[i].number, inventory[i].name, inventory[i].on_hand);
+        printf("%11d     %-9s     %16d\n", inventory[i].number, inventory[i].name, inventory[i].on_hand);
 }
