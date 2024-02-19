@@ -9,6 +9,6 @@
 *            len.                                         *
 ***********************************************************/
 
-void read_word(char *word, int len);
+int read_word(char *word, int len);
 
 #endif
