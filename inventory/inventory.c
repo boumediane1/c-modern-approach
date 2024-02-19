@@ -115,11 +115,11 @@ void update(void) {
         return;
     }
 
-    int on_hand;
-    printf("Enter quantity on hand: ");
-    scanf("%d", &on_hand);
+    int change;
+    printf("Enter change in quantity on hand: ");
+    scanf("%d", &change);
 
-    inventory[idx].on_hand = on_hand;
+    inventory[idx].on_hand += change;
 }
 
 void print(void) {
