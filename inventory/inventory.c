@@ -99,7 +99,7 @@ void search(void) {
         return;
     }
 
-    read_line(inventory[idx].name, NAME_LEN);
+    printf("Part name: %s\n", inventory[idx].name);
     printf("Quantity on hand: %d\n", inventory[idx].on_hand);
 }
 
