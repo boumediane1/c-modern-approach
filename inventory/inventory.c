@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "readline.h"
+#include <stdio.h>
 
 #define MAX_PARTS 1000
 #define NAME_LEN 25
@@ -21,7 +21,6 @@ void search(void);
 void update(void);
 
 void print(void);
-
 
 int main(void) {
     for (;;) {
@@ -123,7 +122,23 @@ void update(void) {
 }
 
 void print(void) {
+    for (int i = 0; i < num_parts - 1; i++) {
+        int min = i;
+        for (int j = i + 1; j < num_parts; j++) {
+            if (inventory[j].number < inventory[min].number) {
+                min = j;
+            }
+        }
+
+        if (min != i) {
+            int temp = inventory[i].number;
+            inventory[i].number = inventory[min].number;
+            inventory[min].number = temp;
+        }
+    }
+
     printf("Part Number     Part Name     Quantity on Hand\n");
     for (int i = 0; i < num_parts; i++)
-        printf("%11d     %-9s     %16d\n", inventory[i].number, inventory[i].name, inventory[i].on_hand);
+        printf("%11d     %-9s     %16d\n", inventory[i].number, inventory[i].name,
+               inventory[i].on_hand);
 }
