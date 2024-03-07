@@ -141,9 +141,9 @@ void sort_by_number(struct part *inventory, int num_parts) {
         }
 
         if (min != i) {
-            int temp = inventory[i].number;
-            inventory[i].number = inventory[min].number;
-            inventory[min].number = temp;
+            struct part temp = inventory[i];
+            inventory[i] = inventory[min];
+            inventory[min] = temp;
         }
     }
 }
