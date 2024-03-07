@@ -8,21 +8,24 @@ struct part {
     int number;
     char name[NAME_LEN + 1];
     int on_hand;
-} inventory[MAX_PARTS];
+};
 
-int num_parts = 0; /* number of parts currently stored */
+void insert(struct part *inventory, int *num_parts);
 
-int find_part(int number);
+void search(const struct part *inventory, int num_parts);
 
-void insert(void);
+void update(struct part *inventory, int num_parts);
 
-void search(void);
+void print(const struct part *inventory, int num_parts);
 
-void update(void);
+int find_part(const struct part *inventory, int num_parts, int number);
 
-void print(void);
+void sort_by_number(struct part *inventory, int num_parts);
 
 int main(void) {
+    struct part inventory[MAX_PARTS];
+    int num_parts = 0; /* number of parts currently stored */
+
     for (;;) {
         char code;
         printf("Enter operation code: ");
@@ -32,16 +35,17 @@ int main(void) {
 
         switch (code) {
             case 'i':
-                insert();
+                insert(inventory, &num_parts);
                 break;
             case 's':
-                search();
+                search(inventory, num_parts);
                 break;
             case 'u':
-                update();
+                update(inventory, num_parts);
                 break;
             case 'p':
-                print();
+                sort_by_number(inventory, num_parts);
+                print(inventory, num_parts);
                 break;
             case 'q':
                 return 0;
@@ -52,15 +56,8 @@ int main(void) {
     }
 }
 
-int find_part(int number) {
-    for (int i = 0; i < num_parts; i++)
-        if (inventory[i].number == number)
-            return i;
-    return -1;
-}
-
-void insert(void) {
-    if (num_parts == MAX_PARTS) {
+void insert(struct part *inventory, int *num_parts) {
+    if (*num_parts == MAX_PARTS) {
         printf("Database is full; can't add more parts.\n");
         return;
     }
@@ -70,28 +67,28 @@ void insert(void) {
     printf("Enter part number: ");
     scanf("%d", &part_number);
 
-    if (find_part(part_number) >= 0) {
+    if (find_part(inventory, *num_parts, part_number) >= 0) {
         printf("Part already exists.\n");
         return;
     }
 
-    inventory[num_parts].number = part_number;
+    inventory[*num_parts].number = part_number;
 
     printf("Enter part name: ");
-    read_line(inventory[num_parts].name, NAME_LEN);
+    read_line(inventory[*num_parts].name, NAME_LEN);
 
     printf("Enter quantity on hand: ");
-    scanf("%d", &inventory[num_parts].on_hand);
+    scanf("%d", &inventory[*num_parts].on_hand);
 
-    num_parts++;
+    (*num_parts)++;
 }
 
-void search(void) {
+void search(const struct part *inventory, int num_parts) {
     int number;
     printf("Enter part number: ");
     scanf("%d", &number);
 
-    int idx = find_part(number);
+    int idx = find_part(inventory, num_parts, number);
 
     if (idx == -1) {
         printf("Part not found.\n");
@@ -102,12 +99,12 @@ void search(void) {
     printf("Quantity on hand: %d\n", inventory[idx].on_hand);
 }
 
-void update(void) {
+void update(struct part *inventory, int num_parts) {
     int number;
     printf("Enter part number: ");
     scanf("%d", &number);
 
-    int idx = find_part(number);
+    int idx = find_part(inventory, num_parts, number);
 
     if (idx == -1) {
         printf("Part not found.\n");
@@ -121,7 +118,20 @@ void update(void) {
     inventory[idx].on_hand += change;
 }
 
-void print(void) {
+void print(const struct part *inventory, int num_parts) {
+    printf("Part Number     Part Name     Quantity on Hand\n");
+    for (int i = 0; i < num_parts; i++)
+        printf("%11d     %-9s     %16d\n", inventory[i].number, inventory[i].name, inventory[i].on_hand);
+}
+
+int find_part(const struct part *inventory, int num_parts, int number) {
+    for (int i = 0; i < num_parts; i++)
+        if (inventory[i].number == number)
+            return i;
+    return -1;
+}
+
+void sort_by_number(struct part *inventory, int num_parts) {
     for (int i = 0; i < num_parts - 1; i++) {
         int min = i;
         for (int j = i + 1; j < num_parts; j++) {
@@ -136,9 +146,4 @@ void print(void) {
             inventory[min].number = temp;
         }
     }
-
-    printf("Part Number     Part Name     Quantity on Hand\n");
-    for (int i = 0; i < num_parts; i++)
-        printf("%11d     %-9s     %16d\n", inventory[i].number, inventory[i].name,
-               inventory[i].on_hand);
 }
