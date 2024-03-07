@@ -1,16 +1,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void closest_flight(const int daily_flights[][2], int desired_time, int *departure_time, int *arrival_time);
+struct flight {
+    int departure_time;
+    int arrival_time;
+};
 
-void show_daily_flights(const int daily_flights[][2]);
+void closest_flight(const struct flight *daily_flights, int desired_time, int *departure_time, int *arrival_time);
+
+void show_daily_flights(const struct flight *daily_flights);
 
 void format_time(int minutes, char *time);
 
 int from_time(int hours, int minutes);
 
 int main() {
-    int daily_flights[8][2] = {
+    struct flight daily_flights[] = {
             {from_time(8, 0),   from_time(10, 16)},
             {from_time(9, 43),  from_time(11, 52)},
             {from_time(11, 19), from_time(1, 31)},
@@ -41,29 +46,29 @@ int main() {
     return 0;
 }
 
-void closest_flight(const int daily_flights[][2], int desired_time, int *departure_time, int *arrival_time) {
-    *departure_time = daily_flights[0][0];
-    *arrival_time = daily_flights[0][1];
+void closest_flight(const struct flight *daily_flights, int desired_time, int *departure_time, int *arrival_time) {
+    *departure_time = daily_flights[0].departure_time;
+    *arrival_time = daily_flights[0].arrival_time;
 
     int smallest_diff = abs(desired_time - *departure_time);
 
     for (int i = 1; i < 8; i++) {
-        int diff = abs(desired_time - daily_flights[i][0]);
+        int diff = abs(desired_time - daily_flights[i].departure_time);
 
         if (diff < smallest_diff) {
             smallest_diff = diff;
-            *departure_time = daily_flights[i][0];
-            *arrival_time = daily_flights[i][1];
+            *departure_time = daily_flights[i].departure_time;
+            *arrival_time = daily_flights[i].arrival_time;
         }
     }
 }
 
-void show_daily_flights(const int daily_flights[8][2]) {
+void show_daily_flights(const struct flight daily_flights[]) {
     printf("departure time\tarrival time\n");
     for (int i = 0; i < 8; i++) {
         char departure_time[6], arrival_time[6];
-        format_time(daily_flights[i][0], departure_time);
-        format_time(daily_flights[i][1], arrival_time);
+        format_time(daily_flights[i].departure_time, departure_time);
+        format_time(daily_flights[i].arrival_time, arrival_time);
         printf("%s\t%s\n", departure_time, arrival_time);
     }
 }
