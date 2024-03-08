@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAX_REMIND 50
@@ -7,7 +8,7 @@
 int read_line(char str[], int n);
 
 int main() {
-    char reminders[MAX_REMIND][MSG_LEN + 3];
+    char *reminders[MAX_REMIND]; // elements are pointers to dynamically allocated strings
     char day_str[3], msg_str[MSG_LEN + 1];
     int day, i, num_remind = 0;
 
@@ -31,7 +32,14 @@ int main() {
                 break;
 
         for (int j = num_remind; j > i; j--)
-            strcpy(reminders[j], reminders[j - 1]);
+            reminders[j] = reminders[j - 1];
+
+        reminders[i] = malloc(2 + strlen(msg_str) + 1);
+
+        if (reminders[i] == NULL) {
+            printf("-- No space left --\n");
+            break;
+        }
 
         strcpy(reminders[i], day_str);
         strcat(reminders[i], msg_str);
