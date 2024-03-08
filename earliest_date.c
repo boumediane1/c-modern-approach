@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 typedef struct {
     int day;
@@ -53,5 +54,4 @@ int compare_dates(Date d1, Date d2) {
 
 void format_date(Date date, char *formatted_date) {
     sprintf(formatted_date, "%.2d/%.2d/%.2d", date.month, date.day, date.year);
-    formatted_date[8] = '\0';
 }
