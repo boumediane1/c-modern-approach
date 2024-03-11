@@ -7,45 +7,52 @@ struct node {
     struct node *next;
 };
 
-struct node *delete_node(struct node *list, int value);
+void add_to_list(struct node **list, int value);
 
-struct node *add_to_list(struct node *list, int value);
-
-struct node *search_list2(struct node *list, int value);
+void delete_node(struct node **list, int value);
 
 struct node *search_list(struct node *list, int value);
+
+struct node *search_list2(struct node *list, int value);
 
 struct node *read_numbers(void);
 
 int main() {
+    struct node *first = read_numbers();
+    delete_node(&first, 3);
     return 0;
 }
 
-struct node *delete_node(struct node *list, int value) {
+void add_to_list(struct node **list, int value) {
+    struct node *new_node = malloc(sizeof(struct node));
+
+    if (new_node == NULL) {
+        printf("Error: malloc failed in add_to_list\n");
+        exit(EXIT_FAILURE);
+    }
+
+    new_node->value = value;
+    new_node->next = *list;
+
+    *list = new_node;
+}
+
+void delete_node(struct node **list, int value) {
     struct node *curr, *prev;
 
-    for (curr = list, prev = NULL;
+    for (curr = *list, prev = NULL;
          curr != NULL && curr->value != value;
          prev = curr, curr = curr->next);
 
     if (curr == NULL)
-        return list;             /* n was not found */
+        return;                     /* n was not found */
 
     if (prev == NULL)
-        list = list->next;       /* n is in the first node */
+        *list = (*list)->next;      /* n is in the first node */
     else
-        prev->next = curr->next; /* n is in some other node */
+        prev->next = (*list)->next; /* n is in some other node */
 
     free(curr);
-
-    return list;
-}
-
-struct node *search_list2(struct node *list, int value) {
-    while (list != NULL && list->value != value)
-        list = list->next;
-
-    return list;
 }
 
 struct node *search_list(struct node *list, int value) {
@@ -56,18 +63,11 @@ struct node *search_list(struct node *list, int value) {
     return NULL;
 }
 
-struct node *add_to_list(struct node *list, int value) {
-    struct node *new_node = malloc(sizeof(struct node));
+struct node *search_list2(struct node *list, int value) {
+    while (list != NULL && list->value != value)
+        list = list->next;
 
-    if (new_node == NULL) {
-        printf("Error: malloc failed in add_to_list\n");
-        exit(EXIT_FAILURE);
-    }
-
-    new_node->value = value;
-    new_node->next = list;
-
-    return new_node;
+    return list;
 }
 
 struct node *read_numbers(void) {
@@ -82,6 +82,6 @@ struct node *read_numbers(void) {
         if (value == 0)
             return first;
 
-        first = add_to_list(first, value);
+        add_to_list(&first, value);
     }
 }
