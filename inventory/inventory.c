@@ -1,34 +1,29 @@
 #include "readline.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-#define MAX_PARTS 1000
 #define NAME_LEN 25
 
 struct part {
     int number;
     char name[NAME_LEN + 1];
     int on_hand;
-    double price;
+    struct part *next;
 };
 
-void insert(struct part *inventory, int *num_parts);
+struct part *inventory = NULL;
 
-void search(const struct part *inventory, int num_parts);
+void insert(void);
 
-void update(struct part *inventory, int num_parts);
+void search(void);
 
-void change_price(struct part *inventory, int num_parts);
+void update(void);
 
-void print(const struct part *inventory, int num_parts);
+void print(void);
 
-int find_part(const struct part *inventory, int num_parts, int number);
-
-void sort_by_number(struct part *inventory, int num_parts);
+struct part *find_part(int number);
 
 int main(void) {
-    struct part inventory[MAX_PARTS];
-    int num_parts = 0; /* number of parts currently stored */
-
     for (;;) {
         char code;
         printf("Enter operation code: ");
@@ -38,20 +33,16 @@ int main(void) {
 
         switch (code) {
             case 'i':
-                insert(inventory, &num_parts);
+                insert();
                 break;
             case 's':
-                search(inventory, num_parts);
+                search();
                 break;
             case 'u':
-                update(inventory, num_parts);
-                break;
-            case 'c':
-                change_price(inventory, num_parts);
+                update();
                 break;
             case 'p':
-                sort_by_number(inventory, num_parts);
-                print(inventory, num_parts);
+                print();
                 break;
             case 'q':
                 return 0;
@@ -62,61 +53,67 @@ int main(void) {
     }
 }
 
-void insert(struct part *inventory, int *num_parts) {
-    if (*num_parts == MAX_PARTS) {
+void insert(void) {
+    struct part *curr, *prev, *new_node;
+
+    new_node = malloc(sizeof(struct part));
+
+    if (new_node == NULL) {
         printf("Database is full; can't add more parts.\n");
         return;
     }
 
-    int part_number;
-
     printf("Enter part number: ");
-    scanf("%d", &part_number);
+    scanf("%d", &new_node->number);
 
-    if (find_part(inventory, *num_parts, part_number) >= 0) {
+    for (prev = NULL, curr = inventory;
+         curr != NULL && new_node->number > curr->number;
+         prev = curr, curr = curr->next);
+
+    if (curr != NULL && new_node->number == curr->number) {
         printf("Part already exists.\n");
+        free(new_node); // release the space to avoid memory leak
         return;
     }
 
-    inventory[*num_parts].number = part_number;
-
     printf("Enter part name: ");
-    read_line(inventory[*num_parts].name, NAME_LEN);
+    read_line(new_node->name, NAME_LEN);
 
     printf("Enter quantity on hand: ");
-    scanf("%d", &inventory[*num_parts].on_hand);
+    scanf("%d", &new_node->on_hand);
 
-    printf("Enter price: ");
-    scanf("%lf", &inventory[*num_parts].price);
+    new_node->next = curr;
 
-    (*num_parts)++;
+    if (prev == NULL)
+        inventory = new_node;
+    else
+        prev->next = new_node;
 }
 
-void search(const struct part *inventory, int num_parts) {
+void search(void) {
     int number;
     printf("Enter part number: ");
     scanf("%d", &number);
 
-    int idx = find_part(inventory, num_parts, number);
+    struct part *p = find_part(number);
 
-    if (idx == -1) {
+    if (p == NULL) {
         printf("Part not found.\n");
         return;
     }
 
-    printf("Part name: %s\n", inventory[idx].name);
-    printf("Quantity on hand: %d\n", inventory[idx].on_hand);
-    printf("Price: %g\n", inventory[idx].price);
+    printf("Part name: %s\n", p->name);
+    printf("Quantity on hand: %d\n", p->on_hand);
 }
 
-void update(struct part *inventory, int num_parts) {
+void update(void) {
     int number;
     printf("Enter part number: ");
     scanf("%d", &number);
 
-    int idx = find_part(inventory, num_parts, number);
+    struct part *p = find_part(number);
 
-    if (idx == -1) {
+    if (p == NULL) {
         printf("Part not found.\n");
         return;
     }
@@ -125,54 +122,24 @@ void update(struct part *inventory, int num_parts) {
     printf("Enter change in quantity on hand: ");
     scanf("%d", &change);
 
-    inventory[idx].on_hand += change;
+    p->on_hand += change;
 }
 
-void change_price(struct part *inventory, int num_parts) {
-    int number;
-    printf("Enter part number: ");
-    scanf("%d", &number);
-
-    int idx = find_part(inventory, num_parts, number);
-
-    if (idx == -1) {
-        printf("Part not found.\n");
-        return;
-    }
-
-    double price;
-    printf("Enter new price: ");
-    scanf("%lf", &price);
-
-    inventory[idx].price = price;
+void print(void) {
+    printf("Part Number     Part Name     Quantity on Hand\n");
+    for (struct part *p = inventory; p != NULL; p = p->next)
+        printf("%11d     %-9s     %16d\n", p->number, p->name, p->on_hand);
 }
 
-void print(const struct part *inventory, int num_parts) {
-    printf("Part Number     Part Name     Quantity on Hand     Price\n");
-    for (int i = 0; i < num_parts; i++)
-        printf("%11d     %-9s     %16d     %5g\n", inventory[i].number, inventory[i].name, inventory[i].on_hand, inventory[i].price);
-}
+struct part *find_part(int number) {
+    struct part *p;
 
-int find_part(const struct part *inventory, int num_parts, int number) {
-    for (int i = 0; i < num_parts; i++)
-        if (inventory[i].number == number)
-            return i;
-    return -1;
-}
+    for (p = inventory;
+         p != NULL && number > p->number;
+         p = p->next);
 
-void sort_by_number(struct part *inventory, int num_parts) {
-    for (int i = 0; i < num_parts - 1; i++) {
-        int min = i;
-        for (int j = i + 1; j < num_parts; j++) {
-            if (inventory[j].number < inventory[min].number) {
-                min = j;
-            }
-        }
+    if (p != NULL && number == p->number)
+        return p;
 
-        if (min != i) {
-            struct part temp = inventory[i];
-            inventory[i] = inventory[min];
-            inventory[min] = temp;
-        }
-    }
+    return NULL;
 }
